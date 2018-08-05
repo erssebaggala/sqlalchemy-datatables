@@ -136,7 +136,8 @@ search_methods = {
     'yadcf_multi_select': yadcf_multi_select,
     'yadcf_range_number': yadcf_range_number,
     'yadcf_range_number_slider': yadcf_range_number,
-    'yadcf_range_date': yadcf_range_date
+    'yadcf_range_date': yadcf_range_date,
+    'regex': lambda expr, value, op: expr.op(op)(value)
 }
 
 
@@ -335,7 +336,10 @@ class DataTables:
                 'columns[{:d}][search][value]'.format(i), '')
             if value:
                 search_func = search_methods[self.columns[i].search_method]
-                filter_expr = search_func(self.columns[i].sqla_expr, value)
+                if self.columns[i].search_method == 'regex':
+                    filter_expr = search_func(self.columns[i].sqla_expr, value, self._get_regex_operator())
+                else:
+                    filter_expr = search_func(self.columns[i].sqla_expr, value)
             self.filter_expressions.append(filter_expr)
 
     def _set_global_filter_expression(self):
@@ -398,7 +402,7 @@ class DataTables:
         if isinstance(
                 self.query.session.bind.dialect,
                 postgresql.dialect):
-            return '~'
+            return '~*'
         elif isinstance(
                 self.query.session.bind.dialect,
                 mysql.dialect):
