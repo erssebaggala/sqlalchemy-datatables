@@ -17,7 +17,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
+    name = Column(String)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     birthday = Column(Date)
     address = relationship('Address', uselist=False, backref=backref('user'))

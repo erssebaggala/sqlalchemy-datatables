@@ -25,6 +25,18 @@ class SearchingTest(BaseTest):
             search_value='abc')
         assert res['recordsFiltered'] == '50'
 
+    def test_method_regex(self):
+        res = self.get_result(
+            column=User.name,
+            search_method='regex',
+            search_value='.*')
+
+        if 'error' in res:
+            # unfortunately sqlite doesn't support regexp out of the box'
+            assert 'no such function: REGEXP' in res['error']
+        else:
+            assert res['recordsFiltered'] == '50'
+
     def test_method_numeric(self):
         res = self.get_result(
             column=User.id,
