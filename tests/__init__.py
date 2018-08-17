@@ -2,8 +2,9 @@
 import faker
 import unittest
 import itertools
+import re
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta
 
@@ -19,6 +20,9 @@ class BaseTest(unittest.TestCase):
         """Set up fake database session before all tests."""
         cls.engine = create_engine(
             'sqlite:///db.sqlite', echo=False)  # echo=True for debug
+
+        event.listen(cls.engine, 'begin', BaseTest.add_regex_on_connect)
+
         Base.metadata.create_all(cls.engine)
         Session = sessionmaker(bind=cls.engine)
         cls.session = Session()
@@ -27,6 +31,7 @@ class BaseTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """Tear down database session after all tests."""
+        event.remove(cls.engine, 'begin', BaseTest.add_regex_on_connect)
         Base.metadata.drop_all(cls.engine)
 
     @classmethod
@@ -74,3 +79,8 @@ class BaseTest(unittest.TestCase):
                 params['order[%s][%s]' % (i, key)] = str(value)
 
         return params
+
+    @classmethod
+    def add_regex_on_connect(cls, dbapi_con):
+        """Add REGEX functionality for sqlite"""
+        dbapi_con.connection.create_function("REGEXP", 2, lambda expr, item : re.search(expr, str(item)) is not None)

@@ -45,7 +45,7 @@ class FieldsTest(BaseTest):
         params['columns[0][search][value]'] = '=4'
         params['columns[1][search][value]'] = user.name
         params['columns[2][search][value]'] = '>1965-02-02'
-        params['columns[2][search][value]'] = '<=99'
+        params['columns[3][search][value]'] = '<=99'
         rowTable = DataTables(params, query, columns)
         res = rowTable.output_result()
 
@@ -141,14 +141,10 @@ class FieldsTest3(BaseTest):
             params, query, columns, allow_regex_searches=True)
         res = rowTable.output_result()
 
-        if 'error' in res:
-            # unfortunately sqlite doesn't support regexp out of the box'
-            assert 'no such function: REGEXP' in res['error']
-        else:
-            assert len(res['data']) == 1
-            assert res['recordsTotal'] == '1'
-            assert res['recordsFiltered'] == '1'
-            assert res['data'][0]['1'] == 'Feeeeear Of'
+        assert len(res['data']) == 1
+        assert res['recordsTotal'] == '52'
+        assert res['recordsFiltered'] == '1'
+        assert res['data'][0]['1'] == 'Feeeeear Of'
 
 
 class FieldsTest4(BaseTest):

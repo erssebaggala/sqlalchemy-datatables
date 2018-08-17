@@ -48,7 +48,7 @@ class Address(Base):
     __tablename__ = 'addresses'
 
     id = Column(Integer, primary_key=True)
-    description = Column(String, unique=True)
+    description = Column(String)
     user_id = Column(Integer, ForeignKey('users.id'))
 
     def __unicode__(self):

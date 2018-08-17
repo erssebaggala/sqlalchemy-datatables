@@ -352,7 +352,6 @@ class DataTables:
                 self.params.get('search[regex]') == 'true'):
             op = self._get_regex_operator()
             val = clean_regex(global_search)
-
             def filter_for(col):
                 return col.sqla_expr.op(op)(val)
         else:
